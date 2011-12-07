@@ -1,0 +1,54 @@
+#!/bin/sh
+# defined colors to make it easier to output visually stimulating prompts and other messages
+
+# escapes the arguments you send it
+function esc () { echo -ne "\\033[$*"; }
+
+# ANSI escape for setting colors
+function c () { esc $1m; }
+
+# bold
+function bold () { c 1; }
+# underline
+function underline () { c 4; }
+# blink - when supported
+function blink () { c 5; }
+# reverse (swap fb and bg colors)
+function inverse () { c 7; }
+# reset colors to defaults
+function ansi_reset () { c 0; }
+
+## Foreground Shortcuts
+# normal (reset)
+function fgc () { c "0;$1"; }
+# bold (bright)
+function fgb () { c "1;$1"; }
+
+# easier raw access to 256 colors
+function fgx () { c "38;5;$1"; }
+function bgx () { c "48;5;$1"; }
+
+# Basic ANSI color map
+black=0  # Black/Grey
+red=1    # Red/Pink
+green=2  # Green/LightGreen
+yellow=3 # Orange/Yellow
+blue=4   # Blue/LightBlue
+violet=5 # Purple/Magenta
+cyan=6   # Teal/Cyan
+white=7  # Gray/White
+
+# Foreground and Background prefixes
+fg=3
+bg=4
+
+# 256 extended colors are indexed and mapped to the same number for both foreground and background
+function hex256 { echo $1 | conv-rgb2xterm; }
+
+# my trademark colors
+color_lime='154'
+color_neonberry='26'
+
+# color code escapes your first argument then follows with the rest of them
+function cmsg () { echo -ne "$(c $1)$2 $3 $4 $5 $6 $7 $8 $9"; }
+

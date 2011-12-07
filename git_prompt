@@ -1,0 +1,40 @@
+#!/bin/bash
+# Creates a shiny prompt that integrates well with git
+
+# Load up my script that lets me set colors much easier
+source bashrgb
+
+# Load my prompt helpers that make a lot of this voodoo easier to do
+source prompt_helpers
+
+# pulls information from git to display in the prompt
+git_dirty() {
+    git status 2> ~/.nil |
+      awk 'index($0,"Untracked files:") { unknown = 1 }
+           index($0,"modified:") { changed = 1 }
+           index($0,"new file:") { new = 1 }
+           END {
+             if (unknown) printf "?"
+             else if (changed) printf "!"
+             else if (new) printf "."
+           }'
+}
+
+git_branch() {
+    git branch 2> ~/.nil | \
+      awk -v on_color="$(fgx 26)" -v branch_color=""$(fgx 199) '$1 =="*" { printf on_color " on " branch_color $2 " " $3 }'
+}
+
+# Set the actual prompt string here
+PS1='\[$(title $(PWD))\]$(remote_hostname)\[$(fgx 154)\]\w$(git_branch)\[$(fgx 154)\]$(git_dirty)\n\[\r\]\[$(fgx 26)\]\$\[$(ansi_reset)\] '
+
+# Pseudocode for new features
+# if exists? '.git' then display_git_prompt # speed up the prompt if there's no git repo in this directory
+# display_git_prompt() {git_dirty; git_branch;} # Encapsulate the functionality, no point in shoving it all into the prompt string
+# git_dirty() { ..code.. unless $1 echo} # adds a linefeed if you are calling it without any args to distinguish between interactive and noninteractive usage
+
+# Extra stuff, maybe use later
+    #git bookmarks 2> ~/.nil | \
+    #    awk '/\*/ { printf "\033[37;0m at \033[33;40m" $2 }'
+
+
